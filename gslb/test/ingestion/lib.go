@@ -110,6 +110,53 @@ func getTestGDPObject(appLabelReq, nsLabelReq bool) *gslbalphav1.GlobalDeploymen
 	return &gdp
 }
 
+// Returns a default GSLBHostRule object with
+// 1. No Site Persistence set
+// 2. No Third Party Member Sites
+// 3. No Health Monitors
+// 4. Equal Traffic Split between 2 clusters - cluster1 and cluster2
+func getTestGSLBHRObject(gslbhrName string, gslbhrNamespace string, gslbhrFqdn string) *gslbalphav1.GSLBHostRule {
+	gslbhrMeta := metav1.ObjectMeta{
+		Name:      gslbhrName,
+		Namespace: gslbhrNamespace,
+	}
+
+	gslbhrSitePersistence := gslbalphav1.SitePersistence{
+		Enabled:    false,
+		ProfileRef: "",
+	}
+
+	gslbhrThirdPartyMembers := []gslbalphav1.ThirdPartyMember{}
+
+	gslbHeathMonitors := []string{}
+
+	gslbhrTrafficSplit := []gslbalphav1.TrafficSplitElem{
+		{
+			Cluster: "cluster-1",
+			Weight:  10,
+		},
+		{
+			Cluster: "cluster-2",
+			Weight:  10,
+		},
+	}
+
+	gslbhrSpec := gslbalphav1.GSLBHostRuleSpec{
+		Fqdn:              gslbhrFqdn,
+		SitePersistence:   gslbhrSitePersistence,
+		ThirdPartyMembers: gslbhrThirdPartyMembers,
+		HealthMonitorRefs: gslbHeathMonitors,
+		TrafficSplit:      gslbhrTrafficSplit,
+	}
+
+	gslbhr := gslbalphav1.GSLBHostRule{
+		ObjectMeta: gslbhrMeta,
+		Spec:       gslbhrSpec,
+	}
+
+	return &gslbhr
+}
+
 func inKeyList(key string, data []string) bool {
 	for _, d := range data {
 		if key == d {

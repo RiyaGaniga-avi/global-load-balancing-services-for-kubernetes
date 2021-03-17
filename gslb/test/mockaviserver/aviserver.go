@@ -124,11 +124,18 @@ func DefaultServerMiddleware(w http.ResponseWriter, r *http.Request) {
 		w.Write(finalResponse)
 	case "GET":
 		objects := strings.Split(strings.Trim(url, "/"), "/")
-		if len(objects) > 1 && objects[1] != "gslbservice" {
+		if objects[1] == "gslbservice" {
+			FeedMockData(w, r, "../avimockobjects/gslbservice_mock.json")
+		} else if objects[1] == "gslb" {
+			FeedMockData(w, r, "../avimockobjects/gslb_mock.json")
+		} else if objects[1] == "applicationpersistenceprofile" {
+			FeedMockData(w, r, "../avimockobjects/applicationpersistenceprofile_mock.json")
+		} else if objects[1] == "healthmonitor" {
+			FeedMockData(w, r, "../avimockobjects/healthmonitor_mock.json")
+		} else {
 			w.WriteHeader(http.StatusNotFound)
 			w.Write([]byte(`{"error": "resource not found"}`))
 		}
-		FeedMockData(w, r)
 	case "DELETE":
 		w.WriteHeader(http.StatusNoContent)
 		w.Write(finalResponse)
@@ -138,8 +145,7 @@ func DefaultServerMiddleware(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func FeedMockData(w http.ResponseWriter, r *http.Request) {
-	mockFilePath := "../avimockobjects/gslbservice_mock.json"
+func FeedMockData(w http.ResponseWriter, r *http.Request, mockFilePath string) {
 	url := r.URL.EscapedPath()
 	object := strings.Split(strings.Trim(url, "/"), "/")
 	if len(object) > 1 && r.Method == "GET" {
